@@ -55,12 +55,12 @@ export function ManageTermsModal({ userId, terms, onClose, onChanged, onDelete }
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             placeholder="เช่น ปี 2 เทอม 2"
-            className="flex-1 rounded-lg border border-[var(--color-paper-dim)] bg-[var(--color-card)] px-3 py-2 text-sm"
+            className="flex-1 rounded-lg border border-[var(--color-paper-dim)] bg-[var(--color-card)] px-3 py-2.5 text-sm"
           />
           <button
             type="submit"
             disabled={creating}
-            className="text-sm bg-[var(--color-ink)] text-[var(--color-paper)] px-3 py-2 rounded-lg disabled:opacity-50 shrink-0"
+            className="min-h-11 text-sm bg-[var(--color-ink)] text-[var(--color-paper)] px-4 py-2 rounded-lg disabled:opacity-50 shrink-0"
           >
             + เพิ่มเทอม
           </button>
@@ -75,7 +75,7 @@ export function ManageTermsModal({ userId, terms, onClose, onChanged, onDelete }
             {terms.map((t) => (
               <li
                 key={t.id}
-                className="flex items-center justify-between gap-2 rounded-lg border border-[var(--color-paper-dim)] px-3 py-2"
+                className="flex items-center justify-between gap-2 rounded-lg border border-[var(--color-paper-dim)] px-2 py-1"
               >
                 {editingId === t.id ? (
                   <input
@@ -84,13 +84,13 @@ export function ManageTermsModal({ userId, terms, onClose, onChanged, onDelete }
                     onChange={(e) => setEditingName(e.target.value)}
                     onBlur={() => saveEdit(t)}
                     onKeyDown={(e) => e.key === 'Enter' && saveEdit(t)}
-                    className="flex-1 rounded-md border border-[var(--color-paper-dim)] bg-[var(--color-card)] px-2 py-1 text-sm"
+                    className="flex-1 rounded-md border border-[var(--color-paper-dim)] bg-[var(--color-card)] px-2 py-2.5 text-sm"
                   />
                 ) : (
                   <button
                     type="button"
                     onClick={() => startEdit(t)}
-                    className="flex-1 text-left text-sm text-[var(--color-ink)]"
+                    className="flex-1 min-h-11 px-1 text-left text-sm text-[var(--color-ink)]"
                     title="แตะเพื่อแก้ชื่อ"
                   >
                     {t.name}
@@ -99,7 +99,7 @@ export function ManageTermsModal({ userId, terms, onClose, onChanged, onDelete }
                 <button
                   type="button"
                   onClick={() => onDelete(t)}
-                  className="text-xs text-[var(--color-stamp)] shrink-0"
+                  className="min-h-11 px-3 text-xs text-[var(--color-stamp)] shrink-0"
                 >
                   ลบ
                 </button>

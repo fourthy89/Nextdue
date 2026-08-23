@@ -17,14 +17,14 @@ export function ConfirmDialog({ message, onConfirm, onCancel, confirmLabel = 'à¸
           <button
             type="button"
             onClick={onCancel}
-            className="text-sm px-4 py-2 rounded-full border border-[var(--color-paper-dim)] text-[var(--color-ink-soft)] hover:border-[var(--color-ink-faint)]"
+            className="min-h-11 text-sm px-4 py-2 rounded-full border border-[var(--color-paper-dim)] text-[var(--color-ink-soft)] hover:border-[var(--color-ink-faint)]"
           >
             {cancelLabel}
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className="text-sm px-4 py-2 rounded-full bg-[var(--color-stamp)] text-white font-medium"
+            className="min-h-11 text-sm px-4 py-2 rounded-full bg-[var(--color-stamp)] text-white font-medium"
           >
             {confirmLabel}
           </button>

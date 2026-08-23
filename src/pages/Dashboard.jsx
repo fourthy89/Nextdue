@@ -11,6 +11,7 @@ import { AddSubjectModal } from '../components/AddSubjectModal'
 import { AddAssignmentModal } from '../components/AddAssignmentModal'
 import { ManageTermsModal } from '../components/ManageTermsModal'
 import { ConfirmDialog } from '../components/ConfirmDialog'
+import { CalendarView, dateKey } from '../components/CalendarView'
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'ทั้งหมด' },
@@ -29,6 +30,8 @@ export function Dashboard() {
   const [filterSubject, setFilterSubject] = useState(() => localStorage.getItem('nextdue:filterSubject') || 'all')
   const [selectedTermId, setSelectedTermId] = useState(() => localStorage.getItem('nextdue:selectedTermId') || 'all')
   const [filterStatus, setFilterStatus] = useState(() => localStorage.getItem('nextdue:filterStatus') || 'all')
+  const [viewMode, setViewMode] = useState(() => localStorage.getItem('nextdue:viewMode') || 'list')
+  const [selectedDate, setSelectedDate] = useState(null)
   const [showSubjectModal, setShowSubjectModal] = useState(false)
   const [editingSubject, setEditingSubject] = useState(null)
   const [showAssignmentModal, setShowAssignmentModal] = useState(false)
@@ -77,6 +80,9 @@ export function Dashboard() {
   useEffect(() => {
     localStorage.setItem('nextdue:filterStatus', filterStatus)
   }, [filterStatus])
+  useEffect(() => {
+    localStorage.setItem('nextdue:viewMode', viewMode)
+  }, [viewMode])
 
   const subjectsById = Object.fromEntries(subjects.map((s) => [s.id, s]))
 
@@ -164,6 +170,15 @@ export function Dashboard() {
     .filter((a) => (filterSubject === 'all' ? true : a.subject_id === filterSubject))
     .filter((a) => (filterStatus === 'all' ? true : filterStatus === 'done' ? a.done : !a.done))
     .sort((a, b) => new Date(a.due_at) - new Date(b.due_at))
+
+  // In calendar view, the list only shows once a day is picked — no day
+  // picked means no list, not "everything" (list view still shows everything).
+  const visibleAssignments =
+    viewMode === 'calendar'
+      ? selectedDate
+        ? upcoming.filter((a) => dateKey(a.due_at) === selectedDate)
+        : []
+      : upcoming
 
   return (
     <div className="max-w-5xl mx-auto px-4 pb-24">
@@ -259,29 +274,75 @@ export function Dashboard() {
           </div>
         </div>
 
-        <div className="flex items-center gap-1 mb-3 w-fit rounded-full border border-[var(--color-paper-dim)] bg-[var(--color-card)] p-0.5">
-          {STATUS_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => setFilterStatus(opt.value)}
-              className={`text-xs px-3 py-1 rounded-full transition-colors ${
-                filterStatus === opt.value
-                  ? 'bg-[var(--color-ink)] text-[var(--color-paper)]'
-                  : 'text-[var(--color-ink-soft)]'
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
+        <div className="flex items-center justify-between gap-2 mb-3 flex-wrap">
+          <div className="flex items-center gap-1 w-fit rounded-full border border-[var(--color-paper-dim)] bg-[var(--color-card)] p-0.5">
+            {STATUS_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setFilterStatus(opt.value)}
+                className={`text-xs px-3 py-1 rounded-full transition-colors ${
+                  filterStatus === opt.value
+                    ? 'bg-[var(--color-ink)] text-[var(--color-paper)]'
+                    : 'text-[var(--color-ink-soft)]'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-1 w-fit rounded-full border border-[var(--color-paper-dim)] bg-[var(--color-card)] p-0.5">
+            {[
+              { value: 'list', label: 'รายการ' },
+              { value: 'calendar', label: 'ปฏิทิน' },
+            ].map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => {
+                  setViewMode(opt.value)
+                  setSelectedDate(null)
+                }}
+                className={`text-xs px-3 py-1 rounded-full transition-colors ${
+                  viewMode === opt.value
+                    ? 'bg-[var(--color-ink)] text-[var(--color-paper)]'
+                    : 'text-[var(--color-ink-soft)]'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
         </div>
+
+        {viewMode === 'calendar' && (
+          <div className="mb-3">
+            <CalendarView
+              assignments={upcoming}
+              subjectsById={subjectsById}
+              selectedDate={selectedDate}
+              onSelectDate={setSelectedDate}
+            />
+            {selectedDate && (
+              <button
+                onClick={() => setSelectedDate(null)}
+                className="text-xs text-[var(--color-slate)] underline mt-2"
+              >
+                ล้างวันที่เลือก — แสดงทุกวัน
+              </button>
+            )}
+          </div>
+        )}
 
         {loading ? (
           <p className="text-sm text-[var(--color-ink-soft)]">กำลังโหลด...</p>
-        ) : upcoming.length === 0 ? (
-          <p className="text-sm text-[var(--color-ink-soft)]">ยังไม่มีงานในรายการนี้</p>
+        ) : visibleAssignments.length === 0 ? (
+          <p className="text-sm text-[var(--color-ink-soft)]">
+            {viewMode === 'calendar' && !selectedDate
+              ? 'แตะวันที่ในปฏิทินเพื่อดูงานของวันนั้น'
+              : 'ยังไม่มีงานในรายการนี้'}
+          </p>
         ) : (
           <div className="space-y-3">
-            {upcoming.map((a) => (
+            {visibleAssignments.map((a) => (
               <AssignmentCard
                 key={a.id}
                 assignment={a}
