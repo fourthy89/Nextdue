@@ -1,0 +1,38 @@
+{
+  "name": "Nextdue",
+  "short_name": "Nextdue",
+  "description": "ตารางเรียน งาน และวันสอบ ในที่เดียว",
+  "start_url": "/Nextdue/",
+  "scope": "/Nextdue/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F6F5F1",
+  "theme_color": "#212A3D",
+  "lang": "th",
+  "icons": [
+    {
+      "src": "/Nextdue/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Nextdue/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Nextdue/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/Nextdue/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

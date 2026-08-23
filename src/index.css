@@ -1,0 +1,137 @@
+@import "tailwindcss";
+
+@theme {
+  /* ---- Nextdue design tokens ---- */
+  /* Paper: cool, greyed-down white — not the generic AI-cream */
+  --color-paper: #F6F5F1;
+  --color-paper-dim: #ECEAE3;
+  --color-card: #FFFFFF;
+
+  /* Ink: deep desaturated navy, the "pen" color for text and structure */
+  --color-ink: #212A3D;
+  --color-ink-soft: #57607A;
+  --color-ink-faint: #9CA3B8;
+
+  /* Stamp red — the signature accent, used only for due-date stamps & urgency */
+  --color-stamp: #C1432A;
+  --color-stamp-dim: #E7C9C0;
+
+  /* Moss — "on track" / schedule blocks */
+  --color-moss: #56744F;
+  --color-moss-dim: #DCE5D6;
+
+  /* Sticky-note amber — pinned items, highlights */
+  --color-amber: #E0A83B;
+  --color-amber-dim: #F5E4C2;
+
+  /* Slate-blue — secondary section color for schedule variety */
+  --color-slate: #4C6480;
+  --color-slate-dim: #D8E0E8;
+
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", "Helvetica Neue", sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "Helvetica Neue", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+
+  --radius-card: 14px;
+}
+
+html {
+  background: var(--color-paper);
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  background: var(--color-paper);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  overscroll-behavior-y: none;
+}
+
+/* Comfortable touch targets on Android/iOS without changing desktop sizing */
+button,
+select,
+input[type='checkbox'] {
+  touch-action: manipulation;
+}
+
+/* Hide scrollbar chrome app-wide for a cleaner, more native-app feel —
+   scrolling itself still works fully via touch, wheel, trackpad, and
+   keyboard; only the visible scrollbar track/thumb is hidden. */
+html {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* legacy Edge */
+}
+
+html::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, modern Edge */
+}
+
+/* Reusable on any element that scrolls internally (e.g. the horizontally
+   scrolling weekly schedule) so it gets the same hidden-scrollbar look. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Note: schedule hour lines are generated inline in WeekSchedule.jsx,
+   computed from the same HOUR_HEIGHT constant used to position labels
+   and slots, so they can never drift out of alignment. */
+
+/* Due-date stamp: the app's signature element */
+.stamp {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--color-stamp);
+  color: var(--color-stamp);
+  border-radius: 9999px;
+  font-family: var(--font-display);
+  transform: rotate(-6deg);
+  position: relative;
+}
+
+.stamp::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 9999px;
+  border: 1px solid var(--color-stamp);
+  opacity: 0.5;
+}
+
+.stamp.stamp-muted {
+  border-color: var(--color-ink-faint);
+  color: var(--color-ink-soft);
+}
+
+.stamp.stamp-muted::after {
+  border-color: var(--color-ink-faint);
+}
+
+::selection {
+  background: var(--color-amber-dim);
+  color: var(--color-ink);
+}
+
+/* Visible keyboard focus, kept consistent app-wide */
+:focus-visible {
+  outline: 2px solid var(--color-slate);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
