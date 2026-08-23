@@ -196,12 +196,12 @@ export function Dashboard() {
       <section className="mt-8">
         <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
           <h2 className="font-display text-lg font-semibold text-[var(--color-ink)]">ตารางเรียน</h2>
-          <div className="flex items-center gap-2">
-            <div className="relative">
+          <div className="flex items-center gap-2 flex-wrap justify-end">
+            <div className="relative min-w-0">
               <select
                 value={selectedTermId}
                 onChange={(e) => handleTermChange(e.target.value)}
-                className="appearance-none text-sm rounded-full border border-[var(--color-paper-dim)] bg-[var(--color-card)] pl-3 pr-8 py-1.5"
+                className="appearance-none text-sm rounded-full border border-[var(--color-paper-dim)] bg-[var(--color-card)] pl-3 pr-8 py-1.5 max-w-[9rem] truncate"
               >
                 <option value="all">ทุกเทอม</option>
                 {terms.map((t) => (
@@ -220,13 +220,13 @@ export function Dashboard() {
             </div>
             <button
               onClick={() => setShowTermsModal(true)}
-              className="text-sm border border-[var(--color-paper-dim)] text-[var(--color-ink)] px-3 py-1.5 rounded-full"
+              className="shrink-0 whitespace-nowrap text-sm border border-[var(--color-paper-dim)] text-[var(--color-ink)] px-3 py-1.5 rounded-full"
             >
               จัดการเทอม
             </button>
             <button
               onClick={() => setShowSubjectModal(true)}
-              className="text-sm bg-[var(--color-ink)] text-[var(--color-paper)] px-3 py-1.5 rounded-full"
+              className="shrink-0 whitespace-nowrap text-sm bg-[var(--color-ink)] text-[var(--color-paper)] px-3 py-1.5 rounded-full"
             >
               + เพิ่มวิชา
             </button>
@@ -243,12 +243,12 @@ export function Dashboard() {
       <section className="mt-8">
         <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
           <h2 className="font-display text-lg font-semibold text-[var(--color-ink)]">งาน / โปรเจกต์ / สอบ</h2>
-          <div className="flex items-center gap-2">
-            <div className="relative">
+          <div className="flex items-center gap-2 flex-wrap justify-end">
+            <div className="relative min-w-0">
               <select
                 value={filterSubject}
                 onChange={(e) => setFilterSubject(e.target.value)}
-                className="appearance-none text-sm rounded-full border border-[var(--color-paper-dim)] bg-[var(--color-card)] pl-3 pr-8 py-1.5"
+                className="appearance-none text-sm rounded-full border border-[var(--color-paper-dim)] bg-[var(--color-card)] pl-3 pr-8 py-1.5 max-w-[10rem] truncate"
               >
                 <option value="all">ทุกวิชา</option>
                 {termSubjects.map((s) => (
@@ -267,7 +267,7 @@ export function Dashboard() {
             </div>
             <button
               onClick={() => setShowAssignmentModal(true)}
-              className="text-sm bg-[var(--color-stamp)] text-white px-3 py-1.5 rounded-full"
+              className="shrink-0 whitespace-nowrap text-sm bg-[var(--color-stamp)] text-white px-3 py-1.5 rounded-full"
             >
               + เพิ่มงาน
             </button>
