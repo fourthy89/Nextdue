@@ -2,6 +2,16 @@
 <html lang="th">
   <head>
     <meta charset="UTF-8" />
+    <!-- Prevent browsers (especially mobile Safari) from caching this HTML
+         document. Every deploy renames the built JS/CSS files with a fresh
+         content hash and deletes the old ones — a cached index.html left
+         pointing at yesterday's filenames means the page loads blank until
+         the cache happens to be bypassed. The hashed asset files themselves
+         are safe to cache normally; only this entry document needs to
+         always be fetched fresh. -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1" />
     <title>Nextdue</title>
 
