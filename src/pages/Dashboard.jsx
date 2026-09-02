@@ -20,7 +20,7 @@ const STATUS_OPTIONS = [
 ]
 
 export function Dashboard() {
-  const { user } = useAuth()
+  const { user, session } = useAuth()
   const [subjects, setSubjects] = useState([])
   const [slots, setSlots] = useState([])
   const [assignments, setAssignments] = useState([])
@@ -41,12 +41,32 @@ export function Dashboard() {
 
   const loadAll = useCallback(async () => {
     setLoading(true)
-    const [{ data: subj }, { data: sl }, { data: asg }, { data: trm }] = await Promise.all([
-      supabase.from('subjects').select('*').order('created_at'),
-      supabase.from('schedule_slots').select('*'),
-      supabase.from('assignments').select('*').order('due_at'),
-      supabase.from('terms').select('*').order('created_at'),
-    ])
+
+    const fetchAll = () =>
+      Promise.all([
+        supabase.from('subjects').select('*').order('created_at'),
+        supabase.from('schedule_slots').select('*'),
+        supabase.from('assignments').select('*').order('due_at'),
+        supabase.from('terms').select('*').order('created_at'),
+      ])
+
+    let [subjRes, slRes, asgRes, trmRes] = await fetchAll()
+
+    // A transient 401 can hit any one of these four parallel queries —
+    // usually a stale token right after the app wakes from background, or
+    // a flaky mobile connection. Refresh the session and retry the whole
+    // batch once before giving up, instead of silently showing an empty
+    // dashboard that only fixes itself if the person happens to reload.
+    const hasError = [subjRes, slRes, asgRes, trmRes].some((r) => r.error)
+    if (hasError) {
+      await supabase.auth.refreshSession()
+      ;[subjRes, slRes, asgRes, trmRes] = await fetchAll()
+    }
+
+    const subj = subjRes.data
+    const sl = slRes.data
+    const asg = asgRes.data
+    const trm = trmRes.data
     setSubjects(subj ?? [])
     setSlots(sl ?? [])
     setAssignments(asg ?? [])
@@ -66,7 +86,13 @@ export function Dashboard() {
 
   useEffect(() => {
     loadAll()
-  }, [loadAll])
+    // Re-fetch whenever the auth token changes, not just once on mount.
+    // On first load the session Supabase restores from localStorage can
+    // still be mid-refresh — this first loadAll() can hit a 401 and come
+    // back empty (looks like "the schedule disappeared"). Once the token
+    // finishes refreshing, `session.access_token` changes and this effect
+    // re-runs with a valid token, instead of requiring a manual refresh.
+  }, [loadAll, session?.access_token])
 
   // Remember the person's filter choices across refreshes — mainly so
   // "ยังไม่ทำ" (the status they usually leave it on) doesn't silently
