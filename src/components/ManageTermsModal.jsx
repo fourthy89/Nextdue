@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Modal } from './Modal'
 import { supabase } from '../lib/supabaseClient'
+import { weekNumber, snapToSunday, formatLocalDate } from '../lib/weeks'
 
 /**
  * Create/rename terms directly here. Deleting a term is destructive
@@ -47,6 +48,18 @@ export function ManageTermsModal({ userId, terms, onClose, onChanged, onDelete }
     onChanged()
   }
 
+  async function setWeek1Start(t, dateStr) {
+    // Whatever date is picked, store the Sunday of that same week — week 1
+    // always starts on a Sunday, matching how weeks change over.
+    const snapped = dateStr ? formatLocalDate(snapToSunday(dateStr)) : null
+    const { error: err } = await supabase.from('terms').update({ week1_start: snapped }).eq('id', t.id)
+    if (err) {
+      setError(err.message)
+      return
+    }
+    onChanged()
+  }
+
   return (
     <Modal title="จัดการเทอม" onClose={onClose}>
       <div className="space-y-4">
@@ -72,39 +85,59 @@ export function ManageTermsModal({ userId, terms, onClose, onChanged, onDelete }
           <p className="text-sm text-[var(--color-ink-soft)]">ยังไม่มีเทอมในระบบ — เพิ่มเทอมแรกด้านบน</p>
         ) : (
           <ul className="space-y-2">
-            {terms.map((t) => (
+            {terms.map((t) => {
+              const wn = weekNumber(new Date(), t.week1_start)
+              return (
               <li
                 key={t.id}
-                className="flex items-center justify-between gap-2 rounded-lg border border-[var(--color-paper-dim)] px-2 py-1"
+                className="rounded-lg border border-[var(--color-paper-dim)] px-2 py-1.5 space-y-1.5"
               >
-                {editingId === t.id ? (
-                  <input
-                    autoFocus
-                    value={editingName}
-                    onChange={(e) => setEditingName(e.target.value)}
-                    onBlur={() => saveEdit(t)}
-                    onKeyDown={(e) => e.key === 'Enter' && saveEdit(t)}
-                    className="flex-1 rounded-md border border-[var(--color-paper-dim)] bg-[var(--color-card)] px-2 py-2.5 text-sm"
-                  />
-                ) : (
+                <div className="flex items-center justify-between gap-2">
+                  {editingId === t.id ? (
+                    <input
+                      autoFocus
+                      value={editingName}
+                      onChange={(e) => setEditingName(e.target.value)}
+                      onBlur={() => saveEdit(t)}
+                      onKeyDown={(e) => e.key === 'Enter' && saveEdit(t)}
+                      className="flex-1 rounded-md border border-[var(--color-paper-dim)] bg-[var(--color-card)] px-2 py-2.5 text-sm"
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => startEdit(t)}
+                      className="flex-1 min-h-11 px-1 text-left text-sm text-[var(--color-ink)]"
+                      title="แตะเพื่อแก้ชื่อ"
+                    >
+                      {t.name}
+                    </button>
+                  )}
                   <button
                     type="button"
-                    onClick={() => startEdit(t)}
-                    className="flex-1 min-h-11 px-1 text-left text-sm text-[var(--color-ink)]"
-                    title="แตะเพื่อแก้ชื่อ"
+                    onClick={() => onDelete(t)}
+                    className="min-h-11 px-3 text-xs text-[var(--color-stamp)] shrink-0"
                   >
-                    {t.name}
+                    ลบ
                   </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => onDelete(t)}
-                  className="min-h-11 px-3 text-xs text-[var(--color-stamp)] shrink-0"
-                >
-                  ลบ
-                </button>
+                </div>
+
+                <div className="flex items-center gap-2 px-1 pb-1 flex-wrap">
+                  <label className="text-xs text-[var(--color-ink-faint)]">เริ่มสัปดาห์ที่ 1:</label>
+                  <input
+                    type="date"
+                    value={t.week1_start ?? ''}
+                    onChange={(e) => setWeek1Start(t, e.target.value || null)}
+                    className="rounded-md border border-[var(--color-paper-dim)] bg-[var(--color-card)] px-2 py-1.5 text-xs"
+                  />
+                  {t.week1_start && (
+                    <span className="text-xs text-[var(--color-slate)]">
+                      {wn >= 1 ? `ตอนนี้สัปดาห์ที่ ${wn}` : 'ยังไม่เริ่มเทอม'}
+                    </span>
+                  )}
+                </div>
               </li>
-            ))}
+              )
+            })}
           </ul>
         )}
       </div>

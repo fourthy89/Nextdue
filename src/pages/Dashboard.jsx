@@ -12,6 +12,7 @@ import { AddAssignmentModal } from '../components/AddAssignmentModal'
 import { ManageTermsModal } from '../components/ManageTermsModal'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { CalendarView, dateKey } from '../components/CalendarView'
+import { weekNumber } from '../lib/weeks'
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'ทั้งหมด' },
@@ -221,7 +222,20 @@ export function Dashboard() {
 
       <section className="mt-8">
         <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
-          <h2 className="font-display text-lg font-semibold text-[var(--color-ink)]">ตารางเรียน</h2>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h2 className="font-display text-lg font-semibold text-[var(--color-ink)]">ตารางเรียน</h2>
+            {(() => {
+              if (selectedTermId === 'all') return null
+              const currentTerm = terms.find((t) => t.id === selectedTermId)
+              if (!currentTerm?.week1_start) return null
+              const wn = weekNumber(new Date(), currentTerm.week1_start)
+              return (
+                <span className="text-xs bg-[var(--color-stamp-dim)] text-[var(--color-ink)] px-2.5 py-1 rounded-full font-medium">
+                  {wn >= 1 ? `สัปดาห์ที่ ${wn}` : 'ยังไม่เริ่มเทอม'}
+                </span>
+              )
+            })()}
+          </div>
           <div className="flex items-center gap-2 flex-wrap justify-end">
             <div className="relative min-w-0">
               <select
